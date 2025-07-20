@@ -1,4 +1,4 @@
 apiVersion: v2
-name: kafka-test
-description: Kafka test producer and consumer
+name: kafka-file-log
+description: Kafka producer & consumer with file logs, rotation, PVC, Fluent Bit
 version: 0.1.0

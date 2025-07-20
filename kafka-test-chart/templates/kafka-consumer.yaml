@@ -1,9 +1,10 @@
+{{- if .Values.consumer.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kafka-consumer
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: kafka-consumer
@@ -12,6 +13,14 @@ spec:
       labels:
         app: kafka-consumer
     spec:
+      volumes:
+        - name: log-volume
+          {{- if .Values.log.pvc.enabled }}
+          persistentVolumeClaim:
+            claimName: kafka-file-log-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
       containers:
         - name: consumer
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -22,3 +31,12 @@ spec:
               value: "{{ .Values.kafka.bootstrapServers }}"
             - name: KAFKA_TOPIC
               value: "{{ .Values.kafka.topic }}"
+            - name: LOG_DIR
+              value: "{{ .Values.log.path }}"
+          volumeMounts:
+            - name: log-volume
+              mountPath: "{{ .Values.log.path }}"
+      {{- if .Values.fluentbit.enabled }}
+      {{ include "kafka-file-log.fluentbit-sidecar" . }}
+      {{- end }}
+{{- end }}

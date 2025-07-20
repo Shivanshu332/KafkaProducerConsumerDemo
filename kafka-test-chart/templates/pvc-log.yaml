@@ -1,0 +1,11 @@
+{{- if .Values.log.pvc.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-file-log-pvc
+spec:
+  accessModes: {{ toYaml .Values.log.pvc.accessModes | indent 2 }}
+  resources:
+    requests:
+      storage: {{ .Values.log.pvc.storage }}
+{{- end }}

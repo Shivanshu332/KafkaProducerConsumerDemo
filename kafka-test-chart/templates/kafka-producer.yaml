@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: kafka-producer
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: kafka-producer
@@ -12,6 +12,14 @@ spec:
       labels:
         app: kafka-producer
     spec:
+      volumes:
+        - name: log-volume
+          {{- if .Values.log.pvc.enabled }}
+          persistentVolumeClaim:
+            claimName: kafka-file-log-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
       containers:
         - name: producer
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -24,3 +32,11 @@ spec:
               value: "{{ .Values.kafka.topic }}"
             - name: MESSAGE_INTERVAL
               value: "{{ .Values.producer.interval | quote }}"
+            - name: LOG_DIR
+              value: "{{ .Values.log.path }}"
+          volumeMounts:
+            - name: log-volume
+              mountPath: "{{ .Values.log.path }}"
+      {{- if .Values.fluentbit.enabled }}
+      {{ include "kafka-file-log.fluentbit-sidecar" . }}
+      {{- end }}

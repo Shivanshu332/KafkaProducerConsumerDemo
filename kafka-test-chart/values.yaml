@@ -1,13 +1,27 @@
 image:
-  repository: your-dockerhub/kafka-test
+  repository: yourrepo/kafka-file-log
   tag: latest
   pullPolicy: IfNotPresent
 
 kafka:
-  bootstrapServers: "your-kafka-bootstrap:9092"
+  bootstrapServers: "your-kafka.bootstrap:9092"
   topic: "test-topic"
 
 producer:
   interval: 0.1
+consumer:
+  enabled: true
 
-replicaCount: 1
+log:
+  path: "/logs"
+  pvc:
+    enabled: true
+    accessModes: ["ReadWriteOnce"]
+    storage: "100Mi"
+
+fluentbit:
+  enabled: true
+  image:
+    repository: fluent/fluent-bit
+    tag: 2.0
+    pullPolicy: IfNotPresent

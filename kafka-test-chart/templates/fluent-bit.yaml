@@ -1,0 +1,25 @@
+{{- if .Values.fluentbit.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentbit-config
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Parsers_File parsers.conf
+    [INPUT]
+        Name              tail
+        Path              {{ .Values.log.path }}/*.log*
+        Refresh_Interval  5
+        Rotate_Wait       30
+        Tag               kafka-logs
+        DB                /tmp/logs.db
+    [OUTPUT]
+        Name   stdout
+        Match  kafka-logs
+  parsers.conf: |
+    [PARSER]
+        Name   docker
+        Format json
+        Time_Key time
+{{- end }}
