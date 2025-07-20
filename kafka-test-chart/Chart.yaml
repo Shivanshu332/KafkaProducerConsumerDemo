@@ -1,0 +1,4 @@
+apiVersion: v2
+name: kafka-test
+description: Kafka test producer and consumer
+version: 0.1.0

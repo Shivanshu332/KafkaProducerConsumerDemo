@@ -1,0 +1,13 @@
+image:
+  repository: your-dockerhub/kafka-test
+  tag: latest
+  pullPolicy: IfNotPresent
+
+kafka:
+  bootstrapServers: "your-kafka-bootstrap:9092"
+  topic: "test-topic"
+
+producer:
+  interval: 0.1
+
+replicaCount: 1
