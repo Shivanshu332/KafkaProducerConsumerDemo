@@ -28,15 +28,21 @@ cd kafka-log-rotation-demo
 
 
 docker build -t yourdockerhubuser/kafka-file-log:latest .
+docker build -t kafkaproducerconsumer .
 
 
 docker login
 docker push yourdockerhubuser/kafka-file-log:latest
 
 
+
 kubectl exec -it deployment/kafka-producer -- ls /logs
 kubectl exec -it deployment/kafka-consumer -- ls /logs
 
+helm install kafka-file-log ./kafka-file-log-chart \
+  --set kafka.bootstrapServers="localhost:9092" \
+  --set producer.interval=1 \
+  --set image.command="{python, -c, 'import time, logging; logging.basicConfig(filename=\"/logs/test.log\", level=logging.INFO); i=0; [logging.info(f\"log {i}\") or time.sleep(1) or (i:=i+1) for _ in range(100)]'}"
 
 
 kubectl logs <producer-pod> -c fluentbit
